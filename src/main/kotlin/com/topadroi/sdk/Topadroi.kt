@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // TopadroiSDK — 輕量事件收集 SDK（Android）
 //
 // 與 iOS 對稱的公開 API。收集 + 緩衝 + 批次上報事件到 topadroi server 端（POST /v1/mobile/events）。

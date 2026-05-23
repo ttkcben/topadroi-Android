@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // TopadroiCore — Android SDK 的平台無關核心邏輯（無 android.* / org.json 依賴）。
 //
 // 與 iOS TopadroiCore 對稱：事件組裝、user_data 建構、offline queue 皆為純 Kotlin（Map 結構），
