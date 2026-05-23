@@ -1,8 +1,8 @@
 # TopadroiSDK for Android
 
-A lightweight event-collection SDK for Android. It buffers events on-device (offline queue),
-batches them, and forwards them over HTTPS to your **topadroi** server endpoint for downstream
-processing. The SDK is a thin client — all routing, transformation, and delivery logic lives
+A lightweight event-collection SDK for Android. It buffers events on-device (offline queue with
+exponential-backoff retry), batches them, and forwards them over HTTPS to your **topadroi** server
+endpoint for downstream processing. The SDK is a thin client — all routing, transformation, and delivery logic lives
 server-side.
 
 - **Minimum SDK**: 21 · **compileSdk**: 34 · **JDK**: 17 · **Language**: Kotlin

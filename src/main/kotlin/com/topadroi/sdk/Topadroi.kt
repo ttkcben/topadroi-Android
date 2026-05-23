@@ -8,6 +8,7 @@
 package com.topadroi.sdk
 
 import com.topadroi.sdk.core.TopadroiCore
+import com.topadroi.sdk.core.RetryPolicy
 import android.content.Context
 import android.os.Build
 import org.json.JSONArray
@@ -16,6 +17,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 data class Consent(val adTracking: Boolean = false, val analytics: Boolean = false)
@@ -36,7 +38,11 @@ object Topadroi {
     private var traits = Traits()
     private val initialized = AtomicBoolean(false)
     private val io = Executors.newSingleThreadExecutor()
+    private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private val lock = Any()
+    // 指數退避狀態：連續失敗時延後重試，避免伺服器不可用/離線時密集重試。
+    @Volatile private var consecutiveFailures = 0
+    @Volatile private var nextAllowedFlushMs = 0L
     private val queue = ArrayList<JSONObject>()
 
     private const val PREFS = "topadroi.prefs"
@@ -85,7 +91,8 @@ object Topadroi {
         traits = Traits()
     }
 
-    fun flush() {
+    fun flush(force: Boolean = false) {
+        if (!force && System.currentTimeMillis() < nextAllowedFlushMs) return  // 退避視窗內跳過自動 flush
         val batch: List<JSONObject>
         synchronized(lock) {
             if (queue.isEmpty() || apiKey.isEmpty()) return
@@ -136,13 +143,24 @@ object Topadroi {
                     queue.removeAll { sentIds.contains(it.optString("event_id", null)) }
                     persistQueue()
                 }
+                consecutiveFailures = 0
+                nextAllowedFlushMs = 0L
                 log("flushed ${batch.size} events")
             } else {
-                log("flush failed code=$code (retry later)")
+                scheduleBackoff("code=$code")
             }
         } catch (e: Exception) {
-            log("flush error: ${e.message} (retry later)")
+            scheduleBackoff(e.message ?: "network error")
         }
+    }
+
+    // 連續失敗 → 依 RetryPolicy 計算退避延遲，排程單次強制重試（force=true 繞過退避閘）。
+    private fun scheduleBackoff(reason: String) {
+        consecutiveFailures += 1
+        val delaySec = RetryPolicy.nextDelaySeconds(consecutiveFailures)
+        nextAllowedFlushMs = System.currentTimeMillis() + (delaySec * 1000).toLong()
+        scheduler.schedule({ flush(force = true) }, delaySec.toLong(), TimeUnit.SECONDS)
+        log("flush failed ($reason); retry after ${delaySec.toInt()}s backoff")
     }
 
     private fun persistQueue() {

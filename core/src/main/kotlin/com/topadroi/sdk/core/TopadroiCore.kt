@@ -80,3 +80,14 @@ class EventQueue(maxQueue: Int = 1000) {
         events.addAll(list)
     }
 }
+
+/** 純邏輯：指數退避重試延遲（秒）。failureCount = 連續失敗次數（0 = 無失敗用正常間隔）。
+ *  避免伺服器不可用 / 離線時密集重試（省電量+網路、降伺服器負載）。確定性，可單元測試。 */
+object RetryPolicy {
+    /** base：正常 flush 間隔秒數；cap：退避上限（預設 3600 秒 = 1 小時）。 */
+    fun nextDelaySeconds(failureCount: Int, base: Double = 30.0, cap: Double = 3600.0): Double {
+        if (failureCount <= 0) return base
+        val delay = base * Math.pow(2.0, (failureCount - 1).toDouble())
+        return minOf(delay, cap)
+    }
+}

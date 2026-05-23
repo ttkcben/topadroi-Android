@@ -94,4 +94,23 @@ class TopadroiCoreTest {
         assertEquals(2, q.size)
         assertFalse(q.snapshot().any { it["event_id"] == "old" })
     }
+
+    // ── RetryPolicy（指數退避）──
+    @Test fun retry_noFailureUsesBaseInterval() {
+        assertEquals(30.0, RetryPolicy.nextDelaySeconds(0), 0.0)
+        assertEquals(30.0, RetryPolicy.nextDelaySeconds(-5), 0.0)
+    }
+
+    @Test fun retry_exponentialBackoff() {
+        assertEquals(30.0, RetryPolicy.nextDelaySeconds(1), 0.0)
+        assertEquals(60.0, RetryPolicy.nextDelaySeconds(2), 0.0)
+        assertEquals(120.0, RetryPolicy.nextDelaySeconds(3), 0.0)
+        assertEquals(240.0, RetryPolicy.nextDelaySeconds(4), 0.0)
+    }
+
+    @Test fun retry_capsAtMax() {
+        assertEquals(3600.0, RetryPolicy.nextDelaySeconds(8), 0.0)   // 30*2^7=3840 → 封頂
+        assertEquals(3600.0, RetryPolicy.nextDelaySeconds(99), 0.0)
+        assertEquals(1920.0, RetryPolicy.nextDelaySeconds(7), 0.0)   // 30*2^6=1920
+    }
 }
