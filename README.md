@@ -77,6 +77,24 @@ You must:
    without a lawful basis and consent.
 5. **Complete your Google Play Data Safety form** to accurately reflect the data your app collects
    and shares via this SDK.
+6. **Do not transmit Restricted Data.** Do not send children's data (COPPA / under-16 without
+   verifiable parental consent) or special-category/sensitive data (health, biometrics, precise
+   geolocation without consent, government IDs, etc.). See the Acceptable Use Policy below.
+
+## Terms of Service & data processing
+
+**By integrating this SDK and transmitting data to the topadroi Service, you agree to the topadroi
+Terms of Service.** Use of the Service is governed by:
+
+- **Terms of Service** — https://www.topadroi.com/legal/terms
+- **Acceptable Use Policy** (Restricted Data & prohibited uses) — https://www.topadroi.com/legal/acceptable-use
+- **Data Processing Addendum** (you = controller, topadroi = processor) — https://www.topadroi.com/legal/dpa
+- **Privacy Policy** — https://www.topadroi.com/legal/privacy
+
+Among other things, you represent that you have obtained all required end-user consents, that you
+will not transmit Restricted Data, and that you will indemnify topadroi for claims arising from your
+data or your breach of these terms. The Apache-2.0 license below covers the SDK **source code**; it
+does not replace the Terms that govern use of the **Service**.
 
 ## Disclaimer of warranty & limitation of liability
 
