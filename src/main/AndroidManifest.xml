@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- SDK 上報需網路；INTERNET 為 normal 權限，會 merge 進宿主 app。 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

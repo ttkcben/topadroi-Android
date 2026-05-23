@@ -1,0 +1,8 @@
+# TopadroiSDK (Android) — build 產物 / 本機設定（拆成獨立公開 repo 後生效）
+build/
+.gradle/
+.kotlin/
+local.properties
+*.iml
+.idea/
+.DS_Store
